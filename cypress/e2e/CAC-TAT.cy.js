@@ -1,0 +1,124 @@
+describe('Central de Atendimento ao Cliente TAT', () => {
+
+  beforeEach(() => {
+    cy.visit('./src/index.html')
+  })
+
+  it('Verifica o título da aplicação', () => {
+    cy.title().should('be.equal', 'Central de Atendimento ao Cliente TAT')
+  })
+
+  it('Preeche os campos obrigatórios e envia o formulário', () => {
+    const longText = Cypress._.repeat('abcdefghijklmnopqrstuvwxyz', 20)
+    cy.get('#firstName').type('Bruce')
+    cy.get('#lastName').type('Wayne')
+    cy.get('#email').type('bruce.wayne@wayneenterprise.com')
+    cy.get('#open-text-area').type(longText, { delay: 0 })
+    cy.contains('button', 'Enviar').click()
+
+    cy.get('.success').should('be.visible')
+  })
+
+  it('Exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', () => {
+    cy.get('#firstName').type('Bruce')
+    cy.get('#lastName').type('Wayne')
+    cy.get('#email').type('bruce.wayne@wayneenterprise,com')
+    cy.get('#open-text-area').type('Onde há vontade há caminho')
+    cy.contains('button', 'Enviar').click()
+
+    cy.get('.error').should('be.visible')
+  })
+
+  it('Valida que o campo telefone continua vazio quando preenchido com valores não numéricos', () => {
+    cy.get('#phone')
+      .type('abc')
+      .should('have.value', '')
+  })
+
+  it('Exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário', () => {
+    cy.get('#firstName').type('Bruce')
+    cy.get('#lastName').type('Wayne')
+    cy.get('#email').type('bruce.wayne@wayneenterprise.com')
+    cy.get('#open-text-area').type('Onde há vontade há caminho')
+    cy.get('#phone-checkbox').click()
+    cy.contains('button', 'Enviar').click()
+
+    cy.get('.error').should('be.visible')
+  })
+
+  it('Preenche e limpa os campos nome, sobrenome, email e telefone', () => {
+    cy.get('#firstName')
+      .type('Bruce')
+      .should('have.value', 'Bruce')
+      .clear()
+      .should('have.value', '')
+    cy.get('#lastName')
+      .type('Wayne')
+      .should('have.value', 'Wayne')
+      .clear()
+      .should('have.value', '')
+    cy.get('#email')
+      .type('bruce.wayne@wayneenterprise.com')
+      .should('have.value', 'bruce.wayne@wayneenterprise.com')
+      .clear()
+      .should('have.value', '')
+    cy.get('#phone')
+      .type('123456789')
+      .should('have.value', '123456789')
+      .clear()
+      .should('have.value', '')
+  })
+
+  it('Exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', () => {
+    cy.contains('button', 'Enviar').click()
+
+    cy.get('.error').should('be.visible')
+  })
+
+  it('Envia o formuário com sucesso usando um comando customizado', () => {
+    const data = {
+      firstName: 'Bruce',
+      lastName: 'Wayne',
+      email: 'bruce.wayne@wayneenterprise.com',
+      text: 'Onde há vontade há caminho.'
+    }
+
+    cy.fillMandatoryFieldsAndSubmit(data)
+
+    cy.get('.success').should('be.visible')
+  })
+
+  it('Seleciona um produto (YouTube) por seu texto', () => {
+    cy.get('#product')
+      .select('YouTube')
+      .should('have.value', 'youtube')
+  })
+
+  it('Seleciona um produto (Mentoria) por seu valor (value)', () => {
+    cy.get('#product')
+      .select('mentoria')
+      .should('have.value', 'mentoria')
+  })
+
+  it('Seleciona um produto (Blog) por seu índice', () => {
+    cy.get('#product')
+      .select(1)
+      .should('have.value', 'blog')
+  })
+
+  it('Marca o tipo de atendimento "Feedback"', () => {
+    cy.get('input[type="radio"][value="feedback"]')
+      .check()
+      .should('be.checked')
+  })
+
+  it.only('Marca cada tipo de atendimento', () => {
+    cy.get('input[type="radio"]')
+      .each(typeOfService => {
+        cy.wrap(typeOfService)
+          .check()
+          .should('be.checked')
+      })
+  })
+
+})
