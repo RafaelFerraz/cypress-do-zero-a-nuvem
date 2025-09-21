@@ -40,7 +40,7 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.get('#lastName').type('Wayne')
     cy.get('#email').type('bruce.wayne@wayneenterprise.com')
     cy.get('#open-text-area').type('Onde há vontade há caminho')
-    cy.get('#phone-checkbox').click()
+    cy.get('#phone-checkbox').check()
     cy.contains('button', 'Enviar').click()
 
     cy.get('.error').should('be.visible')
@@ -112,13 +112,23 @@ describe('Central de Atendimento ao Cliente TAT', () => {
       .should('be.checked')
   })
 
-  it.only('Marca cada tipo de atendimento', () => {
+  it('Marca cada tipo de atendimento', () => {
     cy.get('input[type="radio"]')
       .each(typeOfService => {
         cy.wrap(typeOfService)
           .check()
           .should('be.checked')
       })
+  })
+
+  it('Marca ambos checkboxes, depois desmarca o último', () => {
+    cy.get('#check input[type="checkbox"]')
+      .as('checkboxes')
+      .check()
+      .should('be.checked')
+      .last()
+      .uncheck()
+      .should('not.be.checked')
   })
 
 })
