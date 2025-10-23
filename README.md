@@ -33,4 +33,4 @@ Or, run `npm run cy:open:mobile` to open the Cypress App on a mobile viewport.
 If you want to support this project, leave a ⭐.
 ___
 
-This project was created with 💚 by Rafael.
+This project was created with 💚 by Rafael with support from Walmyr.
